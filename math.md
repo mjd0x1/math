@@ -196,6 +196,143 @@
 
 
 
+## Geometric Distribution ##
+
+Is Memoryless
+
+$$ E(X | X > k) = E(X) + k $$
+
+For example, what is the expected value?
+
+$$ E(X) = p . 1 + (1 - p). E(X | X > 1) $$
+
+Either we have success on the first observation or else we reset the expectation beyond the first observation
+
+$$ E(X) = p.1 + (1-p) . (E(X) + 1) $$
+
+$$ E(X) = 1/p $$
+
+How many coin tosses to get 2 successive heads?
+
+$$ E(X) = 2 + 1/2 . 1 + 1/2 . (E(X) + 1) $$
+
+$$ E(X) = 6 $$
+
+How many coin tosses to get 3 successive heads
+
+$$ E(X) = 6 + 1/2 . 1 + 1/2 . (E(X) + 1) $$
+$$ E(X) = 14 $$
+
+
+## Markov ##
+
+We can define the transition matrix as follows.  With 3 states Z, H, HH the last is an absorbing state:
+
+
+$$
+\begin{bmatrix}
+1/2 & 1/2 & 0\\
+1/2 & 0 & 1/2\\
+0 & 0 & 1\\
+\end{bmatrix}
+$$
+
+Calculate the fundamental matrix
+
+$$ N = (I - Q)^{-1} $$
+
+The i,j entry gives the number of times it is transient state j given it starts in transient state j
+
+Therefore if we sum the zero row, ie add the number of times it is in state zero, state h, we will get the expectation of the absorbing state HH
+
+N = 6
+
+Extending for 3 consecutive heads
+
+$$
+\begin{bmatrix}
+1/2 & 1/2 & 0 & 0\\
+1/2 & 0 & 1/2 & 0\\
+1/2 & 0 & 0 & 1/2\\
+0 & 0 & 0 & 1\\
+\end{bmatrix}
+$$
+
+N  = 14
+
+```python
+import numpy as np
+
+
+Q = np.array([[0.5, 0.5,0],
+              [0.5,0,0.5],
+              [0.5,0,0]])
+
+I = np.identity(3)
+N = np.linalg.inv(I - Q)
+
+```
+
+## Markov Expectation Approach ##
+
+Rather than using the transition matrix we can also use Markov on expectations themselves. 
+
+In the example to get 2 consecutive Heads.
+
+E(Z),E(H),E(HH)
+
+are the expectations of getting two heads starting in states Z, H, HH
+
+ From state zero we either stay in state Z which incurs a further E(Z) tosses or we move to state H which will incur further E(H) tosses. In both cases we increment the expectation by 1 as we used up the toss in moving to the state
+
+$$ E(Z) =  1/2 . (E(Z) + 1) + 1/2 . (E(H) + 1) $$
+
+$$ E(H) =  1/2 . (E(Z) + 1) + 1/2 . (E(HH) + 1)$$
+
+Once we're in state HH we're finished so no count
+
+$$ E(HH) = 0 $$
+
+Solving gives E(Z) = 6
+
+## Djikstras Algorithm ##
+
+Calculate the shortest path in a graph.  For example given an adjency matrix
+
+$$
+\begin{bmatrix}
+3 & 2 & 1\\
+0 & 1 & 1\\
+9 & 0 & 1\\
+\end{bmatrix}
+$$
+
+We calculate the shortest path from [0,0] to [2,2]
+
+Which is 3 -> 0 -> 1 -> 0 -> 1 = 5
+
+Pseudocode Algorithm:
+
+```
+directions = [N,S,E,W]
+minimum_cost = array(3,3) initialised to .inf
+visited = array(3,3) boolean
+
+set nodes =[(0,0)]
+while nodes ! empty:
+    initialise current_nodes
+    for each n in nodes:
+        set n = visited
+        for each direction:
+            d = calculate distance from n to each neighbour 
+            if d < minimum_cost[n]:
+                minimum_cost[n] = d
+            if each neighbour is not visited then add to current_nodes
+
+    make current_nodes unique and sort by minimum distances
+    set nodes = current_nodes
+```
+
 
     
 
